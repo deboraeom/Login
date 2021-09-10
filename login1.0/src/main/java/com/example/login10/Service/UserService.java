@@ -52,4 +52,13 @@ public class UserService {
         }
 
     }
+
+    public String updatePassword(String email, String password) throws  UserNotFound{
+
+        UserDTO userDTO = findUserByEmail(email);
+        userDTO.setPassword(password);
+        User user = new User(userDTO.getId(),userDTO.getName(), userDTO.getEmail(), userDTO.getPassword());
+        userRepository.save(user);
+       return "Senha atualizada com sucesso";
+    }
 }

@@ -1,6 +1,7 @@
 package com.example.login10.Controller.User;
 
 import com.example.login10.DTO.UserDTO;
+import com.example.login10.DTO.userPassword;
 import com.example.login10.Exception.UserEmailAlreadyRegistered;
 import com.example.login10.Exception.UserNotFound;
 import com.example.login10.Service.UserService;
@@ -33,7 +34,7 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<UserDetails> findByIdAuthenticationPrincipal(
-                                                                       @AuthenticationPrincipal UserDetails userDetails) {
+         @AuthenticationPrincipal UserDetails userDetails) {
 
         return ResponseEntity.ok(userDetails);
     }
@@ -43,5 +44,14 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public String createUser(@RequestBody @Valid UserDTO userDTO) throws UserEmailAlreadyRegistered {
         return userService.save(userDTO);
+    }
+
+    @PatchMapping("{email}")
+    public ResponseEntity<String> updatePassword (@PathVariable String email,
+                                                  @RequestBody @Valid userPassword userPassword) throws UserNotFound {
+
+        return ResponseEntity.ok(userService.updatePassword(email, userPassword.getPassword()));
+
+
     }
 }

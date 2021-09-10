@@ -1,5 +1,7 @@
 package com.example.login10.config;
 
+import com.example.login10.Service.UserSecurityDetailsService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,7 +12,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @EnableWebSecurity
 @Log4j2
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    private final UserSecurityDetailsService userSecurityDetailsService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -36,6 +40,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .withUser("Lucia").password(passwordEncoder.encode("123"))
                 .roles("CAT");
+
+
+        builder.userDetailsService(userSecurityDetailsService)
+                .passwordEncoder(passwordEncoder);
     }
 
 }

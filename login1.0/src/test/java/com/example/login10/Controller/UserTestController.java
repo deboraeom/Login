@@ -2,12 +2,16 @@ package com.example.login10.Controller;
 
 import com.example.login10.Controller.User.UserController;
 import com.example.login10.DTO.UserDTO;
+import com.example.login10.DTO.userPassword;
+import com.example.login10.Exception.UserNotFound;
+import com.example.login10.Repository.UserRepository;
 import com.example.login10.Service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.internal.stubbing.answers.DoesNothing;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
@@ -23,6 +27,7 @@ import static net.bytebuddy.matcher.ElementMatchers.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,15 +37,16 @@ public class UserTestController {
 
     private static final String USER_API_URL_PATH = "/api/v1/user";
     private static final Long ID=1L;
-    private static final String NAME="Débora";
     private static final String EMAIL= "debora@gmail.com";
-    private static final String PASSWORD="password";
     private static final String MESSAGE = "Usuário Salvo com sucesso";
 
     private MockMvc mockMvc;
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private UserController userController;
@@ -89,6 +95,36 @@ public class UserTestController {
                 .andExpect(jsonPath("$.password").value(userDTO.getPassword()))
                 .andDo(print());
     }
+
+    @Test
+    void pathPasswordSuccessfully() throws Exception {
+
+        String newPassword = "newPassword";
+        String message ="Senha atualizada com sucesso";
+        userPassword userPassword = new userPassword(newPassword);
+        when(userService.updatePassword(EMAIL, userPassword.getPassword())).thenReturn(message);
+        mockMvc.perform(patch(USER_API_URL_PATH+"/"+ EMAIL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(userPassword)))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+    }
+
+//    @Test
+//    void tryPathPasswordButUserNotFoundThenThrowsException() throws Exception {
+//        String newPassword = "newPassword";
+//        String message ="Senha atualizada com sucesso";
+//        userPassword userPassword = new userPassword(newPassword);
+//        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.empty());
+//        mockMvc.perform(patch(USER_API_URL_PATH+"/"+ EMAIL)
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(asJsonString(userPassword)))
+//                .andExpect(status().isBadRequest())
+//                .andDo(print());
+//    }
+
+
 
 
 }

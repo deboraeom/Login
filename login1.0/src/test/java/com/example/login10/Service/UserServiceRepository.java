@@ -101,6 +101,32 @@ public class UserServiceRepository {
     void whenTryToGetAUserByEmailThatDoesNotExistReturnException(){
         User user = new User(name, email, password);
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+        //when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
         assertThrows(UserNotFound.class, ()->userService.findUserByEmail(email));
-}}
+}
+    @Test
+    void PatchPasswordSuccessfully() throws UserNotFound {
+        String newPassword = "newPassword";
+        String message = "Senha atualizada com sucesso";
+        User olderUser = new User(name, email, password);
+        User newUser = new User(olderUser.getId(),olderUser.getName(), olderUser.getEmail(),newPassword);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(olderUser));
+
+        when(userRepository.save(newUser)).thenReturn(olderUser);
+        assertEquals(message, userService.updatePassword(email, newPassword));
+
+    }
+
+    @Test
+    void TryToPatchPasswordButUserNotFound(){
+        String newPassword = "newPassword";
+        User olderUser = new User(name, email, password);
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+        assertThrows(UserNotFound.class, ()->userService.updatePassword(email, newPassword));
+
+    }
+
+
+
+}
